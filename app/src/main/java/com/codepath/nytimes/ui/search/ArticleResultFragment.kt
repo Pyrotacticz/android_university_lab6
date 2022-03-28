@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.codepath.nytimes.networking.CallbackResponse
 import com.codepath.nytimes.models.Article
 import android.widget.Toast
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 
 /**
@@ -35,25 +36,32 @@ class ArticleResultFragment
     private var savedQuery: String? = null
     private var scrollListener: EndlessRecyclerViewScrollListener? = null
     var adapter = MyArticleResultRecyclerViewAdapter()
+
     override fun onPrepareOptionsMenu(menu: Menu) {
-        // TODO (checkpoint #4): Uncomment this code when you implement the search menu
-//        SearchView item = (SearchView) menu.findItem(R.id.action_search).getActionView();
-//        item.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-//            @Override
-//            public boolean onQueryTextSubmit(String query) {
-//                loadNewArticlesByQuery(query);
-//                return false;
-//            }
-//
-//            @Override
-//            public boolean onQueryTextChange(String newText) {
-//                return true;
-//            }
-//        });
+        val item = menu.findItem(R.id.action_search).actionView as SearchView;
+        item.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                item.clearFocus()
+                if (query != null) {
+                    loadNewArticlesByQuery(query)
+                }
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                if (newText != null) {
+                    loadNewArticlesByQuery(newText)
+                }
+                return false
+            }
+
+        })
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+        retainInstance = true
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
